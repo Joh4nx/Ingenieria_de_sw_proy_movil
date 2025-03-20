@@ -349,36 +349,8 @@ class AdvertisementSection extends StatelessWidget {
     return publications.take(5).toList();
   }
 
-  Widget _buildProductCard(Map<String, dynamic> pub, BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: InkWell(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => PublicationDetailPage(data: pub),
-            ),
-          );
-        },
-        child: ProductCard(
-          title: pub['title'] ?? 'Sin título',
-          price: pub['price'] != null ? "\$${pub['price']}" : "",
-          image: (pub['images'] != null && (pub['images'] as List).isNotEmpty)
-              ? (pub['images'][0] as String)
-              : "",
-          publicationId: pub['publicationId'] ?? '',
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    // Detecta el ancho de pantalla para definir si es tablet
-    final screenWidth = MediaQuery.of(context).size.width;
-    final isTablet = screenWidth >= 600;
-
     return FutureBuilder<List<Map<String, dynamic>>>(
       future: _fetchCombinedPopularPosts(),
       builder: (context, snapshot) {
@@ -392,35 +364,29 @@ class AdvertisementSection extends StatelessWidget {
           return const SizedBox();
         }
         List<Map<String, dynamic>> popularPosts = snapshot.data!;
-
-        List<Widget> items;
-        if (isTablet) {
-          // En tablet, agrupar en pares
-          items = [];
-          for (int i = 0; i < popularPosts.length; i += 2) {
-            Widget first = _buildProductCard(popularPosts[i], context);
-            Widget second;
-            if (i + 1 < popularPosts.length) {
-              second = _buildProductCard(popularPosts[i + 1], context);
-            } else {
-              second = const SizedBox(); // Espacio vacío si es impar
-            }
-            items.add(
-              Row(
-                children: [
-                  Expanded(child: first),
-                  const SizedBox(width: 8),
-                  Expanded(child: second),
-                ],
+        List<Widget> items = popularPosts.map((pub) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PublicationDetailPage(data: pub),
+                  ),
+                );
+              },
+              child: ProductCard(
+                title: pub['title'] ?? 'Sin título',
+                price: pub['price'] != null ? "\$${pub['price']}" : "",
+                image: (pub['images'] != null && (pub['images'] as List).isNotEmpty)
+                    ? (pub['images'][0] as String)
+                    : "",
+                publicationId: pub['publicationId'] ?? '',
               ),
-            );
-          }
-        } else {
-          // En móvil, se muestra una sola tarjeta por slide.
-          items = popularPosts.map((pub) {
-            return _buildProductCard(pub, context);
-          }).toList();
-        }
+            ),
+          );
+        }).toList();
         return Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1348,7 +1314,7 @@ class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
   // Nueva paleta de colores.
-  static final Color primaryColor = const Color(0xFF6C5CE7);
+  static final Color primaryColor = const Color(0xFFE7E05C);
   static final Color secondaryColor = const Color(0xFF00B894);
   static final Color accentColor = const Color(0xFFFF7675);
   static final Color backgroundColor = const Color(0xFFF8F9FA);
@@ -1358,7 +1324,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Marketplace Pro',
+      title: 'KHYNGO',
       debugShowCheckedModeBanner: false,
       themeMode: ThemeMode.light,
       theme: ThemeData(
@@ -1581,7 +1547,6 @@ class _HomePageState extends State<HomePage> {
 }
 
 /// INICIO PAGE: Búsqueda, filtros, publicidad y listado de publicaciones.
-/// INICIO PAGE: Búsqueda, filtros, publicidad y listado de publicaciones.
 class InicioPage extends StatefulWidget {
   const InicioPage({Key? key}) : super(key: key);
   @override
@@ -1749,12 +1714,10 @@ class _InicioPageState extends State<InicioPage> {
             for (var doc in filteredDocs) {
               (doc.data() as Map<String, dynamic>)['publicationId'] = doc.id;
             }
-            final screenWidth = MediaQuery.of(context).size.width;
-            final crossAxisCount = screenWidth >= 600 ? 4 : 2;
             return GridView.builder(
               padding: const EdgeInsets.all(12),
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: crossAxisCount,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
                 childAspectRatio: 0.56,
